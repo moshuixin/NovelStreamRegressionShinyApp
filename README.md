@@ -1,1 +1,1 @@
-#An Application for Novel Stream Regression models 
+An Application for Novel Stream Regression models 
