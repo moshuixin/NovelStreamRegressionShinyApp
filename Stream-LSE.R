@@ -16,7 +16,7 @@ streamMulti <- function(X,y,m,constant){
   
   # get the column names 
   Colnames <- colnames(X)
-  
+
   # n is the sample size of each block (or how many rows a block contains)
   n = nrow(X)/m
   

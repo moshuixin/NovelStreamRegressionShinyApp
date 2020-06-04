@@ -20,8 +20,9 @@ server <- function(input, output, session) {
   datasetInput <- reactive({
     switch(input$dataset,
            "Money" = Q_Geld,
-           "oekkennzd" = oekkennzd, 
-           "Simulation data" = simulationDT_1)
+           "oekkennzd" = oekk, 
+           "Simulation data" = simulationDT_1,
+           "Earning" = income)
   })
 
   
@@ -80,6 +81,7 @@ server <- function(input, output, session) {
                           "Simulation data (1000)" = nrow(simulationDT_1),
                           "Simulation data (10000)" = nrow(simulationDT_2),
                           "Simulation data (100000)" = nrow(simulationDT_3),
+                          "Earning" = nrow(earning)
                           )
 
       
@@ -96,7 +98,8 @@ server <- function(input, output, session) {
                         "oekkennzd" = datatable(data.frame( x= nrow(oekkennzd),y= input$block),rownames = "oekkennzd",colnames = def.names), 
                         "Simulation data (1000)" = datatable(data.frame( x= nrow(simulationDT_1),y= input$block),rownames = "Simulation data (1000)",colnames = def.names),
                         "Simulation data (10000)" = datatable(data.frame( x= nrow(simulationDT_2),y= input$block),rownames = "Simulation data (10000)",colnames = def.names),
-                        "Simulation data (100000)" = datatable(data.frame( x= nrow(simulationDT_3),y= input$block),rownames = "Simulation data (100000)",colnames = def.names)
+                        "Simulation data (100000)" = datatable(data.frame( x= nrow(simulationDT_3),y= input$block),rownames = "Simulation data (100000)",colnames = def.names),
+                        "Earning" = datatable(data.frame( x= nrow(earning),y= input$block),rownames = "Earning",colnames = def.names)
     )
     summary
     
@@ -105,18 +108,20 @@ server <- function(input, output, session) {
   # reactive function to fit regression model ------------------
   results <-reactive({
   
-    sum.model <- switch(input$dataset_, 
-                   "Money" =summary(lm(model1, Q_Geld)),
-                   "oekkennzd" = summary(lm(model2, oekkennzd)), 
-                   "Simulation data (1000)" = summary(lm(model3,simulationDT_1)),
-                   "Simulation data (10000)" = summary(lm(model3,simulationDT_2)),
-                   "Simulation data (100000)" = summary(lm(model3,simulationDT_3)),
+    model <- switch(input$dataset_, 
+                   "Money" =lm(model1, Q_Geld),
+                   "oekkennzd" = lm(model2, oekkennzd), 
+                   "Simulation data (1000)" = lm(model3,simulationDT_1),
+                   "Simulation data (10000)" = lm(model3,simulationDT_2),
+                   "Simulation data (100000)" = lm(model3,simulationDT_3),
+                   "Earning" = lm(model4,earning)
     )
-  
+    sum.model = summary(model)
     datOutput = sum.model$coef 
     R.Squared = c(round(sum.model$r.squared, digits = 3),NA,NA,NA)
+    MSE  = c(round(mean(model$residuals^2), digits = 3),NA,NA,NA)
     res = rbind(datOutput,R.Squared)
-
+    res = rbind(res, MSE)
     return(res)
     })
 
@@ -135,8 +140,9 @@ server <- function(input, output, session) {
                     "oekkennzd" = streamMulti(DS2_X,DS2_y,input$block,lr), 
                     "Simulation data (1000)" = streamMulti(DS3_X,DS3_y,input$block,lr),
                     "Simulation data (10000)" = streamMulti(sim2_DS3_X,sim2_DS3_y,input$block,lr),
-                    "Simulation data (100000)" = streamMulti(sim3_DS3_X,sim3_DS3_y,input$block,lr)
-                  
+                    "Simulation data (100000)" = streamMulti(sim3_DS3_X,sim3_DS3_y,input$block,lr),
+                    "Earning" = streamMulti(earning_x, earning_y, input$block,lr)
+                    
                   )
     return(res)
     
@@ -152,7 +158,8 @@ server <- function(input, output, session) {
                     "oekkennzd" = timeStream(oekkennzd[,2:5], input$block , oekk_model), 
                     "Simulation data (1000)" = timeStream(simulationDT_1, input$block , simu_model),
                     "Simulation data (10000)" = timeStream(simulationDT_2, input$block , simu_model),
-                    "Simulation data (100000)" = timeStream(simulationDT_3, input$block , simu_model)
+                    "Simulation data (100000)" = timeStream(simulationDT_3, input$block , simu_model),
+                    "Earning" = timeStream(earning, input$block,earning_model)
                     )
     
   return(sum.3)
@@ -167,6 +174,9 @@ server <- function(input, output, session) {
     if (input$dataset_!= "oekkennzd")
     {
       lm = results()[1:3,1]
+    }
+    if (input$dataset_== "Earning"){
+      lm = results()[1:5,1]
     }
     
     return(lm)
@@ -187,11 +197,14 @@ server <- function(input, output, session) {
     
     if (input$showMd1) {
       coeff <- data.matrix(res$Coefficients[,input$block])
+      
       # r-squared
       r.squared <- t(res$summary[input$block,2:3])
       
       
-      sum.model3 <- rbind(coeff,r.squared) %>% datatable %>% formatRound(1, digits=3)
+      sum.model3 <- rbind(coeff,r.squared) %>% datatable %>% formatRound(1, digits=2)
+      
+      
       return(sum.model3) 
     }
     } )
@@ -199,13 +212,16 @@ server <- function(input, output, session) {
   output$TimeStream <- DT::renderDataTable({
     
     sum.3 = results.timeStream()$summary
-    
-    if (input$showMd2) {
-      datOut = sum.3$coef 
-      R.Squared = c(round(sum.3$r.squared, digits = 3),NA,NA,NA)
 
-      res = rbind(datOut,R.Squared) %>% datatable %>% formatRound(1:4, digits=3)
-      
+    if (input$showMd2) {
+      datOut = sum.3$coef
+      # 
+      # R.Squared = c(round(sum.3$r.squared, digits = 3),NA,NA,NA)
+      # MSE =  c(round(results.timeStream()$mse, digits = 3),NA,NA,NA)
+      new = data.frame(MSE = c(results.timeStream()$mse,NA,NA,NA), R.Squared = c(sum.3$r.squared,NA,NA,NA))
+
+      res = rbind(datOut,t(new)) %>% datatable %>% formatRound(1:4, digits=2)
+
       return(res)
     }
     } )
@@ -255,16 +271,26 @@ server <- function(input, output, session) {
             geom_line(aes(y = coefIter1[,3], colour = names1[3] )) +
             geom_line(aes(y = coefIter1[,4], colour = names1[4] ))
         }
+        if (length(names1)==5)
+        {
+          p1 = ggplot(data= coefIter1 ,aes(x = as.numeric(ID) ) )+ 
+            geom_line(aes(y = coefIter1[,1], colour = names1[1] )) +
+            geom_line(aes(y = coefIter1[,2], colour = names1[2] )) + 
+            geom_line(aes(y = coefIter1[,3], colour = names1[3] )) +
+            geom_line(aes(y = coefIter1[,4], colour = names1[4] )) +
+            geom_line(aes(y = coefIter1[,5], colour = names1[5] ))
+        }
         
       
         p1 = p1 + xlab("The number of data stream") + ylab("Coeffcient") + ggtitle("The trend of the coef. in chosen dataset for Stream-LSE")+
           scale_x_continuous(limits = c(1,input$block))
       }
       
-      if(input$plotMd2) {
+    if(input$plotMd2) {
         
         coefIter = data.frame(t(res3))
         names = colnames(coefIter)
+        print(names)
         
         if (length(names)==4){
           p2 = ggplot(data= coefIter ,aes(x = as.numeric(row.names(coefIter)) ) )+ 
@@ -282,6 +308,18 @@ server <- function(input, output, session) {
             geom_line(aes(y = coefIter[,1], colour = names[1]  )) +
             geom_line(aes(y = coefIter[,2], colour = names[2]  )) +
             geom_line(aes(y = coefIter[,3], colour = names[3]  )) 
+          
+        }
+        
+        
+        if (length(names)==5)
+        {
+          p2 = ggplot(data = coefIter ,aes(x = as.numeric(row.names(coefIter)) ) )+ 
+            geom_line(aes(y = coefIter[,1], colour = names[1]  )) +
+            geom_line(aes(y = coefIter[,2], colour = names[2]  )) +
+            geom_line(aes(y = coefIter[,3], colour = names[3]  )) +
+            geom_line(aes(y = coefIter[,4], colour = names[4] ))  +
+            geom_line(aes(y = coefIter[,5], colour = names[5] ))
           
         }
         p2 = p2 + xlab("The number of data stream") + ylab("Coeffcient") + ggtitle("The trend of the coef. in chosen dataset for Time-Stream")+

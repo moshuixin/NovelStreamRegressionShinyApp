@@ -64,6 +64,7 @@ timeStream<- function (DS, m, Md)
     
     #getting the coef.
     coef = fit.model$coefficients
+
     coefIter[,i] = coef
     rownames(coefIter) <- c("(Intercept)", colnames(DS)[2:ncol(DS)])
     
@@ -71,7 +72,7 @@ timeStream<- function (DS, m, Md)
     mse =  mean(fit.model$residuals^2)
     
     # stores the summary of the model and the coefficients
-    result <- list("summary"=summary, "coef" = coefIter )
+    result <- list("summary"=summary, "coef" = coefIter,"mse"=mse )
   }
   return (result)
 }

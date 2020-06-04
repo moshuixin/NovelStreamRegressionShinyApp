@@ -1,4 +1,4 @@
-setwd("/Users/xinxin/documents/Merseburg/Masterarbeit/R_code")
+setwd("/Users/xinxin/Documents/Merseburg/Masterarbeit/Novel-Stream-Regression-shiny-app-")
 getwd()
 # library
 library(DT)
@@ -21,18 +21,21 @@ library(htmlTable)
 library(car)
 library(stargazer)
 library(gridExtra)
-
+library(olsrr)
+library(readr)
+library(tidyverse)
+library(caret)
 
 #-----------------------------------------------------------------------------------------
 #TASK ONE: load the data
 #-----------------------------------------------------------------------------------------
 
 # dataset1: money data
-geld2 <- read_excel("geld2.xlsx", col_types = c("text", "numeric", "numeric", "numeric"), skip = 11)
+geld2 <- read_excel("data/geld2.xlsx", col_types = c("text", "numeric", "numeric", "numeric"), skip = 11)
 # Y Bruttosozialprodukt, M1 MassfuerGeldmenge, P Preisbereinigungsindex
 
 # dataset2: oek data
-oekkennzd <- read_excel("oekkennzd.xlsx", col_types = c("text", "numeric", "numeric", "numeric", "numeric"), skip = 12)
+oekk <- read_excel("data/oekkennzd.xlsx", col_types = c("text", "numeric", "numeric", "numeric", "numeric"), skip = 12)
 
 # dataset3: simulation
 
@@ -64,9 +67,31 @@ temp_3.3 = rbind(simulation_data(10000,3,-0.6,-6), simulation_data(20000,0.11,3,
 simulationDT_3 = rbind(temp_3.1,temp_3.2)
 simulationDT_3 = rbind(simulationDT_3,temp_3.3)
 
+#dataset 4
+
+# income dataset 
+# Earning and Education
+dt  <- read_table2("data/TableF4-1.txt", skip = 27)
+#choosing the data,which were participants in the formal labor market
+dt <- dt[dt["WHRS"] != 0,]
+incomeDT =  dt[2:7]
+
+# add variable: woman income,in 1975 dollars
+WINC = dt$WHRS*dt$WW
+incomeDT["WINC"] = WINC
+#add variable: Children = how many children unten 18 years old
+#incomeDT <- transform(incomeDT, Children=ifelse(KL6== 0  & K618== 0,0,1))
+Children = dt$KL6+dt$K618
+incomeDT["Children"] = Children
+income =  incomeDT %>% select(4,5,7,8)
+
+#add new variable 
+income["WA2"] = (income$WA)^2
+
+income = income[,c(3,1,2,4,5)]
 
 #-----------------------------------------------------------------------------------------
-#TASK two: Formate the data
+#TASK two: Format the data
 #-----------------------------------------------------------------------------------------
 
 # regression with seasonaility (just for dataset 1)
@@ -76,13 +101,21 @@ colnames(geld) <- c("Year", "Quarter")
 Q_Geld <- cbind(geld, geld2[,2:4])
 
 
-oekkennzd = data.frame(oekkennzd)
+oekk = data.frame(oekk)
 
 # Normalization the money
 
 Q_Geld = Q_Geld %>% mutate_at(c("Y", "M1","P"), ~(scale(.) %>% as.vector))
+
 # Normalization the oekk.
-oekkennzd = oekkennzd %>% mutate_at(c("SP", "CPI","ULC"), ~(scale(.) %>% as.vector))
+oekkennzd = oekk %>% mutate_at(c("SP", "CPI","ULC"), ~(scale(.) %>% as.vector))
+
+#normalization the earnings 
+normalize <- function(x) {
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+
+earning = normalize(income)
 
 #-----------------------------------------------------------------------------------------
 #TASK three: preprocessing the data for analysing
@@ -114,24 +147,35 @@ sim3_DS3_x0 = rep(1, nrow(simulationDT_3))
 sim3_DS3_X =as.matrix(cbind(sim3_DS3_x0,simulationDT_3[,2:3]))
 sim3_DS3_y= as.matrix(simulationDT_3[,1])
 
+#set the earning data
+
+
+earning_x0 = rep(1, nrow(earning))
+earning_x = as.matrix(cbind(earning_x0, earning %>% select(2,3,4,5)))
+print(colnames(earning_x))
+earning_y = as.matrix(simulationDT_3[,1])
+
 #---------------------------------
 # regression model
 #---------------------------------
 
 # Init mutilple model
-money_model  = Y ~ M1 + P
+money_model  = Y~ M1 + P
 oekk_model = IR ~ SP+ CPI + ULC
 simu_model = y ~ x1 + x2
+earning_model = WINC ~  WA + WE  + Children + WA2
 
 # multiple regression model
-model1 = lm (money_model ,Q_Geld)
+model1 = lm (money_model ,data = Q_Geld)
 model2 = lm (oekk_model ,oekkennzd)
 model3 = lm (simu_model ,simulationDT_1)
+model4 = lm(earning_model, earning)
 
 #mse
 print(sprintf("MSE=%0.3f",  mean(model1$residuals^2)))
 print(sprintf("MSE=%0.3f",  mean(model2$residuals^2)))
 print(sprintf("MSE=%0.2f",  mean(model3$residuals^2)))
+print(sprintf("MSE=%0.3f",  mean(model4$residuals^2)))
 
 # output the latex table
 #stargazer(model1, model2, model3, title="Regression Results", align=TRUE)
@@ -142,5 +186,13 @@ print(sprintf("MSE=%0.2f",  mean(model3$residuals^2)))
 car::vif(model1)
 car::vif(model2)
 car::vif(model3)
+car::vif(model4)
 
-
+# correlation 
+Q_dat = Q_Geld[3:5]
+cor(Q_dat)
+cor(oekkennzd[3:5])
+cor(simulationDT_1)
+cor(simulationDT_2)
+cor(simulationDT_3)
+cor(income)

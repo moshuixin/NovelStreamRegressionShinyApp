@@ -66,7 +66,7 @@ ui <- fluidPage(
                         sidebarPanel(
                           selectInput(inputId = "dataset",
                                       label = "Choose a dataset:",
-                                      choices = c("Money","oekkennzd", "Simulation data")),
+                                      choices = c("Money","oekkennzd", "Simulation data", "Earning")),
                           
                           selectInput("variable", "Select variable for x axis",
                                       choices = NULL),
@@ -87,6 +87,11 @@ ui <- fluidPage(
                           conditionalPanel(
                             'input.dataset === "oekkennzd"',
                             helpText("IR = interest rate, SP = share price, CPI = consumer price index, ULC = unit labour costs")
+                          ),
+                          # help text to dataset 4 ----
+                          conditionalPanel(
+                            'input.dataset === "Earning"',
+                            helpText("WINC = Woman Income in 1975 dollars, WA= Woman Age, WE = Woman Education in years, Children = Dummy variable =1 if children under 18 in the household, else 0    ")
                           )
                       
                         ),
@@ -119,8 +124,8 @@ ui <- fluidPage(
 
                           
                           selectInput("dataset_", "Please choose a dataset:",
-                                      choices = c("Money", "oekkennzd",  "Simulation data (1000)","Simulation data (10000)","Simulation data (100000)"),
-                                      selected = "Money"),
+                                      choices = c("Money", "oekkennzd",  "Simulation data (1000)","Simulation data (10000)","Simulation data (100000)","Earning"),
+                                      selected = "oekkennzd"),
                           tags$hr(),
                           # choose the number of blocks
                           numericInput("block", "Please choose a number of blocks:", 5, min = 1, max = NA),
@@ -191,7 +196,7 @@ ui <- fluidPage(
                                 ),
                            
                           tabPanel("Plot",
-                                   h4("Coefficient of multiple linear regression:",style = "color:blue"),
+                                   h4("Coefficient of Multiple Regression:",style = "color:blue"),
                                    verbatimTextOutput("plot0"),
                                    h4("Coefficient of novel stream regression:",style = "color:blue"),
                                   plotOutput("plot2"),value=2
