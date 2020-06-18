@@ -67,7 +67,7 @@ ui <- fluidPage(
                           selectInput(inputId = "dataset",
                                       label = "Choose a dataset:",
                                       choices = c("Money","oekkennzd", "Simulation data", "Earning")),
-                          
+                          tags$hr(),
                           selectInput("variable", "Select variable for x axis",
                                       choices = NULL),
                           
@@ -79,19 +79,24 @@ ui <- fluidPage(
                           # checkboxInput("show.points", "show points", TRUE),
                           
                            #  help text to dataset 1 ----
+                          tags$hr(),
                           conditionalPanel(
                            'input.dataset === "Money"',
-                           helpText("Y= Bruttosozialprodukt, M = Mass fuer Geldmenge, P = Preisbereinigungsindex")),
+                           helpText("Y= Bruttosozialprodukt",
+                           br(),
+                           "M1 = Mass fuer Geldmenge",
+                           br(),
+                           "P = Preisbereinigungsindex")),
                           # 
                           # help text to dataset 2 ----
                           conditionalPanel(
                             'input.dataset === "oekkennzd"',
-                            helpText("IR = interest rate, SP = share price, CPI = consumer price index, ULC = unit labour costs")
+                            helpText("IR = interest rate", br(), "SP = share price", br(), "CPI = consumer price index", br(), "ULC = unit labour costs")
                           ),
                           # help text to dataset 4 ----
                           conditionalPanel(
                             'input.dataset === "Earning"',
-                            helpText("WINC = Woman Income in 1975 dollars, WA= Woman Age, WE = Woman Education in years, Children = Dummy variable =1 if children under 18 in the household, else 0    ")
+                            helpText("WINC = Wife's Income in 1975 dollars",br(), "WA= Wife's Age", br(),"WE = Wife's Education in years", br(),"Children = how many kinds, if children under 18 in the household")
                           )
                       
                         ),
@@ -108,7 +113,9 @@ ui <- fluidPage(
                             tabPanel("Table",DT::dataTableOutput("table")),
                             
                           
-                            tabPanel("Plot", plotOutput("plot1"),  value = 1)
+                            tabPanel("Plot", 
+                                     plotOutput("plot1"), 
+                                     plotOutput("ggplot"), value = 2)
                             
                           )
         
@@ -128,7 +135,7 @@ ui <- fluidPage(
                                       selected = "oekkennzd"),
                           tags$hr(),
                           # choose the number of blocks
-                          numericInput("block", "Please choose a number of blocks:", 5, min = 1, max = NA),
+                          numericInput("block", "Please choose a number of blocks:", 8, min = 1, max = NA),
                       
                           tags$hr(),
                           # constant 

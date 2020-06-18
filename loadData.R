@@ -12,6 +12,7 @@ library(stringr)
 library(zoo)
 library(Matrix)
 library(xtable)
+library(ggplot2)
 
 # load package
 library(sjPlot)
@@ -88,7 +89,7 @@ income =  incomeDT %>% select(4,5,7,8)
 #add new variable 
 income["WA2"] = (income$WA)^2
 
-income = income[,c(3,1,2,4,5)]
+income = data.frame(income[,c(3,1,2,4,5)])
 
 #-----------------------------------------------------------------------------------------
 #TASK two: Format the data
@@ -96,12 +97,19 @@ income = income[,c(3,1,2,4,5)]
 
 # regression with seasonaility (just for dataset 1)
 # convert data in Quarter 
+
+
 geld <- str_split_fixed(geld2$Quartal,fixed("-"),2)
 colnames(geld) <- c("Year", "Quarter")
 Q_Geld <- cbind(geld, geld2[,2:4])
 
 
 oekk = data.frame(oekk)
+
+oekk_test = str_split_fixed(oekk$quartal,fixed("-"),2)
+colnames(oekk_test) = c("Quarter","Year")
+oekk_test <- cbind(oekk_test, oekk[,2:5])
+oekk_test$Quartal <- paste(oekk_test$Year, oekk_test$Quarter)
 
 # Normalization the money
 
@@ -196,3 +204,38 @@ cor(simulationDT_1)
 cor(simulationDT_2)
 cor(simulationDT_3)
 cor(income)
+
+# plot
+library(tidyr)
+plot_money = geld2 %>%
+  gather(Variable,value, Y, M1, P) %>%
+  ggplot(aes(x= as.yearqtr(Quartal), y=value, colour=Variable)) +
+  geom_line()+
+  ggtitle("Money data") +
+  labs(x = "Quartal Date", y = "Value")
+
+plot_oekk = oekk_test %>%
+  gather(Variable,value, IR,SP,CPI,ULC) %>%
+  ggplot(aes(x= as.yearqtr(Quartal), y=value, colour=Variable)) +
+  geom_line()+
+  ggtitle("Oekk. data") +
+  labs(x = "Quartal Date", y = "Value")
+
+income$id= 1:nrow(income)
+
+plot_income = income %>%
+  gather(Variable,value, WINC, WA, WE, Children) %>%
+  ggplot(aes(x= id, y=value, colour=Variable)) +
+  geom_line()+
+  ylim(0, 3000)+
+  ggtitle("Earnings data") +
+  labs(x = "Data Points", y = "Value")
+
+simulationDT_1$id= 1:nrow(simulationDT_1)
+
+plot_simu = simulationDT_1 %>%
+  gather(Variable,value,y,x1,x2) %>%
+  ggplot(aes(x= id, y=value, colour=Variable)) +
+  geom_line()+
+  ggtitle("Simulated data 1") +
+  labs(x = "Data Points", y = "Value")

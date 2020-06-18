@@ -74,5 +74,7 @@ timeStream<- function (DS, m, Md)
     # stores the summary of the model and the coefficients
     result <- list("summary"=summary, "coef" = coefIter,"mse"=mse )
   }
+  
+  #print(xtable(t(result$coef), "Time-Stream Model"))
   return (result)
 }

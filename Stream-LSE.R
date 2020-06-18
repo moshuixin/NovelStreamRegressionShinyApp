@@ -106,6 +106,6 @@ streamMulti <- function(X,y,m,constant){
   
   # stores the mse and the parameters
   result <- list('Coefficients'= betaIter,'summary'= dt)
-  
+  #print(xtable(t(result$Coefficients), "latex"))
   return(result)
 }

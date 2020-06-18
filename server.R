@@ -70,6 +70,23 @@ server <- function(input, output, session) {
 
     
   })
+  
+  # plot for special ------------------------
+  
+  output$ggplot  <- renderPlot({
+    
+     if(input$dataset== "Money")
+       {plot = plot_money}
+     if(input$dataset=="oekkennzd")
+     {plot = plot_oekk}
+     if(input$dataset=="Earning")
+     {plot = plot_income}
+      if(input$dataset=="Simulation data")
+      {plot = plot_simu}
+     plot
+    
+  })
+  
   #------------------------------------------------------------
   # tab 2 
   #------------------------------------------------------------
