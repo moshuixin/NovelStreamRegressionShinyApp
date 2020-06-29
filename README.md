@@ -5,16 +5,17 @@ This shiny app can be downloading and installed by running the following command
 ```
 git clone https://github.com/moshuixin/NovelStreamRegressionShinyApp.git
 ```
-After downloading the code, it can be loaded the libiary() command
+After downloading the code, it can be loaded the library() command, e.g. by loading the package "ggplot2":
 ```
-libarary()
+libarary("ggplot2")
 ```
 Project tree
 --
 .
-* [data](./data)
+* [data](./data)                                        # data sets files
    * [geld.xlsx](./data/geld2.xlsx)
    * [oekkennzd.xlsx](./data/oekkennzd.xlsx)
+   * [TableF4-1.txt](./data/TableF4-1.txt)
 * loadData.R
 * server.R
 * ui.R
@@ -23,4 +24,5 @@ Project tree
 * [www](./www)
   * [alg1.png](./www/alg1.png)
   * [alg2.png](./www/alg2.png)
+* ReadME.md
 
