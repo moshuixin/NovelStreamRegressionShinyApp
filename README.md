@@ -11,7 +11,6 @@ libarary("ggplot2")
 ```
 Project tree
 --
-.
 * [data](./data)                                      
    * [geld.xlsx](./data/geld2.xlsx)
    * [oekkennzd.xlsx](./data/oekkennzd.xlsx)
