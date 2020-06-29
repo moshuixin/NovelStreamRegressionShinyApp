@@ -1,4 +1,4 @@
-An Application for Novel Stream Regression models 
+# An Application for Novel Stream Regression models 
 --
 Installation and Usage
 --
@@ -10,7 +10,8 @@ After downloading the code, it can be loaded the libiary() command
 ```
 libarary()
 ```
-# Project tree
+Project tree
+--
 .
 * [data](./data)
    * [geld.xlsx](./data/geld2.xlsx)
