@@ -1,9 +1,9 @@
 #import the files
-source("loadData.R")
-source("Stream-LSE.R")
-source("Time-Stream.R")
+source("loadData.R")    # for preprocessing data
+source("Stream-LSE.R")  # for Stream-LSE algorithm
+source("Time-Stream.R") # for Time-Stream algorithm
 
-#plotting theme for ggplot2
+# plotting theme for ggplot2
 .theme<- theme(
   axis.line = element_line(colour = 'gray', size = .75),
   panel.background = element_blank(),
@@ -14,12 +14,13 @@ source("Time-Stream.R")
 #-------------------Server CODE---------------------------------
 
 # Define server logic to summarize and view selected dataset ----
+
 server <- function(input, output, session) {
   
   # Return the requested dataset ----
   datasetInput <- reactive({
     switch(input$dataset,
-           "Money" = Q_Geld,
+           "Money" = Q_Geld, 
            "oekkennzd" = oekk, 
            "Simulation data" = simulationDT_1,
            "Earning" = income)
@@ -52,14 +53,13 @@ server <- function(input, output, session) {
     updateSelectInput(session, "group", choices = var.opts)
   })
   
+  # select the variable for outputting the plot
   selectedvar <- reactive({
-    
-    
     datasetInput()[, c(input$variable, input$group)]
   }) 
   
   
-  # plot1 for dataset review--------------------------------------------------------
+  # plot 1 for dataset review--------------------------------------------------------
   output$plot1 <- renderPlot({
 
       df1 <- selectedvar()
@@ -74,6 +74,43 @@ server <- function(input, output, session) {
   # plot for special ------------------------
   
   output$ggplot  <- renderPlot({
+    
+    # output plots for data sets
+  
+    plot_money = geld2 %>%
+      gather(Variable,value, Y, M1, P) %>%
+      ggplot(aes(x= as.yearqtr(Quartal), y=value, colour=Variable)) +
+      geom_line()+
+      ggtitle("Money data") +
+      labs(x = "Quartal Date", y = "Value")
+    
+    plot_oekk = oekk_test %>%
+      gather(Variable,value, IR,SP,CPI,ULC) %>%
+      ggplot(aes(x= as.yearqtr(Quartal), y=value, colour=Variable)) +
+      geom_line()+
+      ggtitle("Oekk. data") +
+      labs(x = "Quartal Date", y = "Value")
+    
+    income$id= 1:nrow(income)
+    
+    plot_income = income %>%
+      gather(Variable,value, WINC, WA, WE, Children) %>%
+      ggplot(aes(x= id, y=value, colour=Variable)) +
+      geom_line()+
+      ylim(0, 3000)+
+      ggtitle("Earnings data") +
+      labs(x = "Data Points", y = "Value")
+    
+    simulationDT_1$id= 1:nrow(simulationDT_1)
+    
+    plot_simu = simulationDT_1 %>%
+      gather(Variable,value,y,x1,x2) %>%
+      ggplot(aes(x= id, y=value, colour=Variable)) +
+      geom_line()+
+      ggtitle("Simulated data 1") +
+      labs(x = "Data Points", y = "Value")
+    
+    
     
      if(input$dataset== "Money")
        {plot = plot_money}
@@ -107,7 +144,6 @@ server <- function(input, output, session) {
     }
   )
   # reactiv function to summary the data stream ---------------------
-  
   datasummary <-reactive({
     def.names = c("Total Rows","Blocks")
     summary <- switch(input$dataset_, 
@@ -167,7 +203,6 @@ server <- function(input, output, session) {
   })
 
   # reactive function to fit Time Stream algorithm -------------------
-  
   results.timeStream <- reactive({
     
     sum.3 <- switch(input$dataset_, 
@@ -183,6 +218,7 @@ server <- function(input, output, session) {
 
   })
   
+  # reactive function -------------------
   lm.coff <-  reactive({
     p0 <- ggplot()
     if (input$dataset_== "oekkennzd"){
@@ -199,6 +235,7 @@ server <- function(input, output, session) {
     return(lm)
     
   })
+  
   # ---------------------------------------------
   # diskplay datatables for mutilple regression model
   # ----------------------------------------------

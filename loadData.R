@@ -1,3 +1,12 @@
+##########################################################################################
+# Novel stream algorithm
+# Xinxin Yang
+#
+#  
+# This program is used to read data and preprocess data.
+# 
+
+
 setwd("/Users/xinxin/Documents/Merseburg/Masterarbeit/Novel-Stream-Regression-shiny-app-")
 getwd()
 # library
@@ -5,16 +14,12 @@ library(DT)
 library(shiny)
 library(readxl)
 library(ggplot2)
-library(stringr)
 library(dplyr)
 library(data.table)
 library(stringr)
 library(zoo)
 library(Matrix)
 library(xtable)
-library(ggplot2)
-
-# load package
 library(sjPlot)
 library(sjmisc)
 library(sjlabelled)
@@ -26,20 +31,20 @@ library(olsrr)
 library(readr)
 library(tidyverse)
 library(caret)
+library(tidyr)
+
 
 #-----------------------------------------------------------------------------------------
-#TASK ONE: load the data
+#TASK ONE: loading the data
 #-----------------------------------------------------------------------------------------
-
-# dataset1: money data
+# load dataset 1: money data ----
 geld2 <- read_excel("data/geld2.xlsx", col_types = c("text", "numeric", "numeric", "numeric"), skip = 11)
 # Y Bruttosozialprodukt, M1 MassfuerGeldmenge, P Preisbereinigungsindex
 
-# dataset2: oek data
+# load dataset 2: oekk data -----
 oekk <- read_excel("data/oekkennzd.xlsx", col_types = c("text", "numeric", "numeric", "numeric", "numeric"), skip = 12)
 
-# dataset3: simulation
-
+# generate the simulated data sets ----
 simulation_data <- function(n,beta0,beta1,beta2)
 {
   # simulation regression data
@@ -55,6 +60,7 @@ simulation_data <- function(n,beta0,beta1,beta2)
   simlationDT = data.frame(y,x1,x2)
   return(simlationDT)
 }
+
 # data set 1: data size =1000
 simulationDT_1 = rbind(simulation_data(400,1,2,-2), simulation_data(600,4,2,-3))
 # data set 2: data size = 10000
@@ -68,51 +74,44 @@ temp_3.3 = rbind(simulation_data(10000,3,-0.6,-6), simulation_data(20000,0.11,3,
 simulationDT_3 = rbind(temp_3.1,temp_3.2)
 simulationDT_3 = rbind(simulationDT_3,temp_3.3)
 
-#dataset 4
-
-# income dataset 
-# Earning and Education
+# load the data set 4: Earning and Education ----
 dt  <- read_table2("data/TableF4-1.txt", skip = 27)
-#choosing the data,which were participants in the formal labor market
+#choose the data,which were participants in the formal labor market
 dt <- dt[dt["WHRS"] != 0,]
+#select the features
 incomeDT =  dt[2:7]
-
-# add variable: woman income,in 1975 dollars
+# add variable: wife's income, in 1975 dollars
 WINC = dt$WHRS*dt$WW
 incomeDT["WINC"] = WINC
 #add variable: Children = how many children unten 18 years old
-#incomeDT <- transform(incomeDT, Children=ifelse(KL6== 0  & K618== 0,0,1))
 Children = dt$KL6+dt$K618
 incomeDT["Children"] = Children
 income =  incomeDT %>% select(4,5,7,8)
-
-#add new variable 
+#add new variable quarad Wife's age
 income["WA2"] = (income$WA)^2
-
+#combine the data as data frame
 income = data.frame(income[,c(3,1,2,4,5)])
 
 #-----------------------------------------------------------------------------------------
-#TASK two: Format the data
+#TASK two: Formating the data
 #-----------------------------------------------------------------------------------------
 
 # regression with seasonaility (just for dataset 1)
 # convert data in Quarter 
-
-
 geld <- str_split_fixed(geld2$Quartal,fixed("-"),2)
 colnames(geld) <- c("Year", "Quarter")
 Q_Geld <- cbind(geld, geld2[,2:4])
 
-
+# convert the data in data frame
 oekk = data.frame(oekk)
 
+# split the data into quater 
 oekk_test = str_split_fixed(oekk$quartal,fixed("-"),2)
 colnames(oekk_test) = c("Quarter","Year")
 oekk_test <- cbind(oekk_test, oekk[,2:5])
 oekk_test$Quartal <- paste(oekk_test$Year, oekk_test$Quarter)
 
 # Normalization the money
-
 Q_Geld = Q_Geld %>% mutate_at(c("Y", "M1","P"), ~(scale(.) %>% as.vector))
 
 # Normalization the oekk.
@@ -122,55 +121,55 @@ oekkennzd = oekk %>% mutate_at(c("SP", "CPI","ULC"), ~(scale(.) %>% as.vector))
 normalize <- function(x) {
   return ((x - min(x)) / (max(x) - min(x)))
 }
-
 earning = normalize(income)
 
 #-----------------------------------------------------------------------------------------
-#TASK three: preprocessing the data for analysing
+#TASK three: preprocessing the data for analyzing
 #-----------------------------------------------------------------------------------------
 
-# set the money data
+# set the money data----
 x0 = rep(1, nrow(Q_Geld))
 X = as.matrix (cbind(x0, Q_Geld[,4:5]))
 y= as.matrix(Q_Geld[,3])
 
-
-#set the oekk
+# set the oekk----
 DS2_x0 = rep(1, nrow(oekkennzd))
 DS2_X =as.matrix(cbind(DS2_x0,oekkennzd[,3:5]))
 DS2_y= as.matrix(oekkennzd[,2])
 
-# set the simulationsdata
+# set the simulated data with data size = 1000 ----
 DS3_x0 = rep(1, nrow(simulationDT_1))
 DS3_X =as.matrix(cbind(DS3_x0,simulationDT_1[,2:3]))
 DS3_y= as.matrix(simulationDT_1[,1])
 
-# size 10000
+# set simualted data with data size = 10000----
 sim2_DS3_x0 = rep(1, nrow(simulationDT_2))
 sim2_DS3_X =as.matrix(cbind(sim2_DS3_x0,simulationDT_2[,2:3]))
 sim2_DS3_y= as.matrix(simulationDT_2[,1])
 
-#size 100000
+# set simulated data with data size = 100000 ----
 sim3_DS3_x0 = rep(1, nrow(simulationDT_3))
 sim3_DS3_X =as.matrix(cbind(sim3_DS3_x0,simulationDT_3[,2:3]))
 sim3_DS3_y= as.matrix(simulationDT_3[,1])
 
-#set the earning data
-
-
+# set the earning data ----
 earning_x0 = rep(1, nrow(earning))
 earning_x = as.matrix(cbind(earning_x0, earning %>% select(2,3,4,5)))
 print(colnames(earning_x))
 earning_y = as.matrix(simulationDT_3[,1])
 
-#---------------------------------
-# regression model
-#---------------------------------
+#-----------------------------------------------------------------------------------
+# Task four: building nultiple regression models
+#-----------------------------------------------------------------------------------
 
-# Init mutilple model
+# Init mutilple model----
+# for the money data
 money_model  = Y~ M1 + P
+# for the oekk data
 oekk_model = IR ~ SP+ CPI + ULC
+# for the simulated data
 simu_model = y ~ x1 + x2
+#for the earning data
 earning_model = WINC ~  WA + WE  + Children + WA2
 
 # multiple regression model
@@ -179,7 +178,7 @@ model2 = lm (oekk_model ,oekkennzd)
 model3 = lm (simu_model ,simulationDT_1)
 model4 = lm(earning_model, earning)
 
-#mse
+# calcauting the mse value
 print(sprintf("MSE=%0.3f",  mean(model1$residuals^2)))
 print(sprintf("MSE=%0.3f",  mean(model2$residuals^2)))
 print(sprintf("MSE=%0.2f",  mean(model3$residuals^2)))
@@ -188,15 +187,16 @@ print(sprintf("MSE=%0.3f",  mean(model4$residuals^2)))
 # output the latex table
 #stargazer(model1, model2, model3, title="Regression Results", align=TRUE)
 
-#----------------------------------
-# multicollinearity
-#---------------------------------
+#-----------------------------------------------------------------------------------
+# Task five: computing multicollinearity
+#-----------------------------------------------------------------------------------
 car::vif(model1)
 car::vif(model2)
 car::vif(model3)
 car::vif(model4)
-
-# correlation 
+#------------------------------------------------------------------------------------
+# Task six: computing correlation matrix
+#------------------------------------------------------------------------------------
 Q_dat = Q_Geld[3:5]
 cor(Q_dat)
 cor(oekkennzd[3:5])
@@ -204,38 +204,3 @@ cor(simulationDT_1)
 cor(simulationDT_2)
 cor(simulationDT_3)
 cor(income)
-
-# plot
-library(tidyr)
-plot_money = geld2 %>%
-  gather(Variable,value, Y, M1, P) %>%
-  ggplot(aes(x= as.yearqtr(Quartal), y=value, colour=Variable)) +
-  geom_line()+
-  ggtitle("Money data") +
-  labs(x = "Quartal Date", y = "Value")
-
-plot_oekk = oekk_test %>%
-  gather(Variable,value, IR,SP,CPI,ULC) %>%
-  ggplot(aes(x= as.yearqtr(Quartal), y=value, colour=Variable)) +
-  geom_line()+
-  ggtitle("Oekk. data") +
-  labs(x = "Quartal Date", y = "Value")
-
-income$id= 1:nrow(income)
-
-plot_income = income %>%
-  gather(Variable,value, WINC, WA, WE, Children) %>%
-  ggplot(aes(x= id, y=value, colour=Variable)) +
-  geom_line()+
-  ylim(0, 3000)+
-  ggtitle("Earnings data") +
-  labs(x = "Data Points", y = "Value")
-
-simulationDT_1$id= 1:nrow(simulationDT_1)
-
-plot_simu = simulationDT_1 %>%
-  gather(Variable,value,y,x1,x2) %>%
-  ggplot(aes(x= id, y=value, colour=Variable)) +
-  geom_line()+
-  ggtitle("Simulated data 1") +
-  labs(x = "Data Points", y = "Value")
