@@ -7,12 +7,11 @@ This shiny app can be downloading and installed by running the following command
 ```
 git clone https://github.com/moshuixin/NovelStreamRegressionShinyApp.git
 ```
-At first, 
-
-After downloading the code and installing the packages, it can be loaded the library() command, e.g. by loading the package "ggplot2":
+After downloading the code, it can be loaded the library() command, e.g. by loading the package "ggplot2":
 ```
 libarary("ggplot2")
 ```
+Run app
 
 References
 --
