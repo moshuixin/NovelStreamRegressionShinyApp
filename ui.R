@@ -66,7 +66,7 @@ ui <- fluidPage(
                            column(12,
                                   #h4("Acknowledgements"),
                                   tags$div("Work done by Xinxin Yang for the Master thesis. The instructor is Prof. Liebscher."),
-                                  tags$div("The datasets used in this project is Free and found be",
+                                  tags$div("The datasets consist of the real-life datasets and the artificial datasets. The real-life datasets used in this project is Free and can be found",
                                   tags$a(href="http://pages.stern.nyu.edu/~wgreene/Text/tables/tablelist5.htm","here.")),
                                   a("Github", href="https://github.com/moshuixin/NovelStreamRegressionShinyApp")
                                   )
