@@ -5,5 +5,5 @@ Content
 --
 It contains two novvel stream regression mothods: Stream-LSE and Time-Stream.
 
-[Deploy & Share shiny App online](https://www.google.com)
+[Deploy & Share shiny App online](https://streamregressiontool.shinyapps.io/novel-stream-regression-shiny-app-/)
 
