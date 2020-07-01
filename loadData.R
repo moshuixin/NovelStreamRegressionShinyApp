@@ -5,10 +5,8 @@
 #  
 # This program is used to read data and preprocess data.
 # 
-
-
-setwd("/Users/xinxin/Documents/Merseburg/Masterarbeit/Novel-Stream-Regression-shiny-app-")
-getwd()
+#setwd("/Users/xinxin/Documents/Merseburg/Masterarbeit/Novel-Stream-Regression-shiny-app-")
+#getwd()
 # library
 library(DT)
 library(shiny)

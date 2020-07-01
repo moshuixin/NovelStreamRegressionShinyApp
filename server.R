@@ -1,3 +1,9 @@
+# ##############
+# server.R 
+###############
+
+
+
 #import the files
 source("loadData.R")    # for preprocessing data
 source("Stream-LSE.R")  # for Stream-LSE algorithm

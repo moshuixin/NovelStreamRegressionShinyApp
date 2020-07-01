@@ -1,3 +1,10 @@
+# ######################
+# ui.R 
+#
+# 
+#######################
+
+
 
 # Define UI for dataset viewer app ----
 ui <- fluidPage(
@@ -13,14 +20,14 @@ ui <- fluidPage(
     ),
   
   # App title ----
-  titlePanel("ShinyApp"),
+  titlePanel("Novel Stream Regression - Shiny Tool"),
   
   
   
   # Sidebar with a slider input for number of bins 
   navbarPage(h4(""),
              tabPanel( value="tab1",
-                       h4("Welcome"),
+                       h4("Introduction"),
                        fluidPage(
                          fluidRow(
                            
@@ -36,32 +43,48 @@ ui <- fluidPage(
                                          ))),
                          br(),
                          fluidRow(
-                           column(4,div(style = "height:400px;background-color: #ffffff;", h3("Multiple Regression Method:"),
-                                        p("Multiple regression is an extension of linear regression which includes more than one independent variable."),
-                                        br()
+                           column(4,div(style = "background-color: #ffffff;", h3("Multiple Regression Method:"),
+                           p("Multiple regression is an extension of linear regression which includes more than one independent variable."),
+                           br()
                            )),
                            column(4,h3("Stream-LSE Method:"),
                                   p("The idea of this method is that next data improve the estimators evaluated in previous steps."),
                                   img(src='alg1.png', height="80%", width="80%", align = "center"),
-                                  br()
+                                  #br()
                                   #actionButton("button2",icon = icon("th"),"View details"
                                   ),
-                           column(4,h3("Time Stream Method:"),
+                           column(4,h3("Time-Stream Method:"),
                                   p("The idea of this method is that the parameters change with time."),
                                   img(src='alg2.png', height="80%", width="80%", align = "center"),
-                                  br()
+                                  #br()
                                   #actionButton("button2",icon = icon("th"),"View details")
                            )
                            
                          ),
-                         br()
+                         tags$hr(),
+                         fluidRow(
+                           column(12,
+                                  #h4("Acknowledgements"),
+                                  tags$div("Work done by Xinxin Yang for the Master thesis. The instructor is Prof. Liebscher."),
+                                  tags$div("The datasets used in this project is Free and found be",
+                                  tags$a(href="http://pages.stern.nyu.edu/~wgreene/Text/tables/tablelist5.htm","here.")),
+                                  a("Github", href="https://github.com/moshuixin/NovelStreamRegressionShinyApp")
+                                  )
+                         ),
+                         fluidRow(
+                           column(12, h4("Contact"),
+                               tags$div("For questions, please email",
+                                  tags$a(href="https://www.hs-merseburg.de/hochschule/information/personenverzeichnis/details/person/liebscher-eckhard-335/","Prof. Liebscher.")),
+                                  #("or"),
+                                  #tags$a(href="mohuixinxin@gmail.com","Xinxin Yang.")),
+                           ))
       
                          )
                        
                        
              ),
              #tab1------------------------------
-             tabPanel( value="tab0",h4("Overview"),
+             tabPanel( value="tab0",h4("Overview Datasets"),
                       sidebarLayout(
                         sidebarPanel(
                           selectInput(inputId = "dataset",
@@ -177,7 +200,7 @@ ui <- fluidPage(
                                               #h3(strong("Multiple Linear Rregression"),style = "color:blue")
                                         ),
                                         column(6,  
-                                               h4("Data Summary",style = "color:blue"),
+                                               h4("Summary of dataset",style = "color:blue"),
                                                br(),
                                                br(),
                                                DT::dataTableOutput("datasum")
@@ -185,7 +208,7 @@ ui <- fluidPage(
                                         ),
                                        
                                         column(6,
-                                               h4("Multiple Regression Model Summary", style = "color:blue"),
+                                               h4("Summary of reults for the Multiple Regression Model", style = "color:blue"),
                                                DT::dataTableOutput("multipleregression"))
                               ),  
                               fluidRow(
@@ -193,11 +216,11 @@ ui <- fluidPage(
                                        #h3(strong("Stream Regression"),style = "color:blue")
                                 ),
                                 column(6,  
-                                       h4("Stream-LSE Model Summary",style = "color:blue"),
+                                       h4("Summary of reults for the Stream-LSE Model",style = "color:blue"),
                                        DT::dataTableOutput("StreamLSE")
                                 ),
                                 column(6,
-                                       h4("Time-Stream Model Summary",style = "color:blue"),
+                                       h4("Summary of reults for the Time-Stream Model",style = "color:blue"),
                                        DT::dataTableOutput("TimeStream"))
                               )
                                 ),

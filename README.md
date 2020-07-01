@@ -3,13 +3,13 @@ The goal of this shiny app is to provide a way to evaluate and visualize the nov
 
 Installation and Usage
 --
-This shiny app can be downloading and installed by running the following command from console:
+This shiny app can be downloading and installed by running the following command from R console:
 ```
-git clone https://github.com/moshuixin/NovelStreamRegressionShinyApp.git
+install.packages("shiny")
 ```
-After downloading the code, it can be install the R packages from R console:
+After downloading, it can be install the R packages from R console:
 ```
-install.packages()
+
 ```
 It can be loaded the library() command, e.g. by loading the package "ggplot2":
 ```
