@@ -5,6 +5,6 @@ account: streamregressiontool
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 2525274
-bundleId: 3339547
+bundleId: 3340132
 url: https://streamregressiontool.shinyapps.io/novel-stream-regression-shiny-app-/
-when: 1593618635.22326
+when: 1593626837.52005

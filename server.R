@@ -1,5 +1,5 @@
-# ##############
-# server.R 
+# #############
+# This is the server portion of a shiny app
 ###############
 
 

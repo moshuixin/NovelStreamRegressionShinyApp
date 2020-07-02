@@ -1,14 +1,13 @@
 # ######################
 # ui.R 
 #
-# 
-#######################
+# This is the ui portion of a shiny app
 
 
 
 # Define UI for dataset viewer app ----
 ui <- fluidPage(
-  
+  # css 
   tags$head(
     tags$style(HTML("
                     #.navbar .navbar-nav {float: left}
@@ -48,7 +47,7 @@ ui <- fluidPage(
                            br()
                            )),
                            column(4,h3("Stream-LSE Method:"),
-                                  p("The idea of this method is that next data improve the estimators evaluated in previous steps."),
+                                  p("The idea of this method is that the next coming data improves the estimators evaluated in previous steps."),
                                   img(src='alg1.png', height="80%", width="80%", align = "center"),
                                   #br()
                                   #actionButton("button2",icon = icon("th"),"View details"
@@ -65,7 +64,7 @@ ui <- fluidPage(
                          fluidRow(
                            column(12,
                                   #h4("Acknowledgements"),
-                                  tags$div("Work done by Xinxin Yang for the Master thesis. The instructor is Prof. Liebscher."),
+                                  tags$div("Work done by Xinxin Yang for the master thesis. The instructor is Prof. Liebscher."),
                                   tags$div("The datasets consist of the real-life datasets and the artificial datasets. The real-life datasets used in this project is Free and can be found",
                                   tags$a(href="http://pages.stern.nyu.edu/~wgreene/Text/tables/tablelist5.htm","here.")),
                                   a("Github", href="https://github.com/moshuixin/NovelStreamRegressionShinyApp")
@@ -74,10 +73,11 @@ ui <- fluidPage(
                          fluidRow(
                            column(12, h4("Contact"),
                                tags$div("For questions, please email",
-                                  tags$a(href="https://www.hs-merseburg.de/hochschule/information/personenverzeichnis/details/person/liebscher-eckhard-335/","Prof. Liebscher.")),
-                                  #("or"),
-                                  #tags$a(href="mohuixinxin@gmail.com","Xinxin Yang.")),
-                           ))
+                                  tags$a(href="https://www.hs-merseburg.de/hochschule/information/personenverzeichnis/details/person/liebscher-eckhard-335/","Prof. Liebscher",
+                                  ("or"),
+                                  tags$a(href="MAILTO:moshuixinxin@gmail.com","Xinxin Yang.")
+                                  ),
+                           )))
       
                          )
                        
@@ -195,6 +195,7 @@ ui <- fluidPage(
                           tabsetPanel(
                             
                             tabPanel("Table",
+
                               fluidRow(
                                         column(12,  
                                               #h3(strong("Multiple Linear Rregression"),style = "color:blue")
@@ -208,7 +209,7 @@ ui <- fluidPage(
                                         ),
                                        
                                         column(6,
-                                               h4("Summary of reults for the Multiple Regression Model", style = "color:blue"),
+                                               h4("Summary of results for the Multiple Regression Model", style = "color:blue"),
                                                DT::dataTableOutput("multipleregression"))
                               ),  
                               fluidRow(
@@ -216,19 +217,19 @@ ui <- fluidPage(
                                        #h3(strong("Stream Regression"),style = "color:blue")
                                 ),
                                 column(6,  
-                                       h4("Summary of reults for the Stream-LSE Model",style = "color:blue"),
+                                       h4("Summary of results for the Stream-LSE Model",style = "color:blue"),
                                        DT::dataTableOutput("StreamLSE")
                                 ),
                                 column(6,
-                                       h4("Summary of reults for the Time-Stream Model",style = "color:blue"),
+                                       h4("Summary of results for the Time-Stream Model",style = "color:blue"),
                                        DT::dataTableOutput("TimeStream"))
                               )
                                 ),
                            
                           tabPanel("Plot",
-                                   h4("Coefficient of Multiple Regression:",style = "color:blue"),
+                                   h4("Coefficients of Multiple Regression:",style = "color:blue"),
                                    verbatimTextOutput("plot0"),
-                                   h4("Coefficient of novel stream regression:",style = "color:blue"),
+                                   h4("Coefficients of Novel Stream Regression:",style = "color:blue"),
                                   plotOutput("plot2"),value=2
                                   
                                   )
