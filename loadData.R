@@ -47,9 +47,6 @@ simulation_data <- function(n,beta0,beta1,beta2)
 {
   # simulation regression data
   set.seed(23)
-  # beta0 = 1
-  # beta1 = 2
-  # beta2= -2
   x1 = runif(n, min = 0, max = 10000)
   x2 = runif(n, min = 0, max = 999)
   error =  rnorm(n) 
