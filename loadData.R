@@ -69,6 +69,7 @@ temp_3.3 = rbind(simulation_data(10000,3,-0.6,-6), simulation_data(20000,0.11,3,
 simulationDT_3 = rbind(temp_3.1,temp_3.2)
 simulationDT_3 = rbind(simulationDT_3,temp_3.3)
 
+
 # load the data set 4: Earning and Education ----
 dt  <- read_table2("data/TableF4-1.txt", skip = 27)
 #choose the data,which were participants in the formal labor market

@@ -89,7 +89,7 @@ ui <- fluidPage(
                         sidebarPanel(
                           selectInput(inputId = "dataset",
                                       label = "Choose a dataset:",
-                                      choices = c("Money","oekkennzd", "Simulation data", "Earning")),
+                                      choices = c("Money","oekkennzd", "Simulation data 1", "Earning", "Simulation data 2", "Simulation data 3")),
                           tags$hr(),
                           selectInput("variable", "Select variable for x axis",
                                       choices = NULL),
@@ -163,7 +163,7 @@ ui <- fluidPage(
                           tags$hr(),
                           # constant 
                           radioButtons("learningrate", "Please choose a learning rate for Stream-LSE:",
-                                       c(0.01,0.1,0.2, "Not Constant")),
+                                       c(0.01,0.1,0.2, 1,"Not Constant")),
                           
                           helpText("Note: Not Constant,",
                                    "it denpends on the number of data items."),

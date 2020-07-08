@@ -28,8 +28,12 @@ server <- function(input, output, session) {
     switch(input$dataset,
            "Money" = Q_Geld, 
            "oekkennzd" = oekk, 
-           "Simulation data" = simulationDT_1,
-           "Earning" = income)
+           "Simulation data 1" = simulationDT_1,
+           "Earning" = income,
+           "Simulation data 2" = simulationDT_2,
+           "Simulation data 3" = simulationDT_3
+           
+           )
   })
 
   
@@ -192,6 +196,7 @@ server <- function(input, output, session) {
                  "0.01"= 0.01,
                  "0.1"= 0.1,
                  "0.2"= 0.2,
+                 "1" = 1,
                  "Not Constant" = NA)
     
     res <- switch(input$dataset_, 
@@ -262,7 +267,7 @@ server <- function(input, output, session) {
       r.squared <- t(res$summary[input$block,2:3])
       
       
-      sum.model3 <- rbind(coeff,r.squared) %>% datatable %>% formatRound(1, digits=2)
+      sum.model3 <- rbind(coeff,r.squared) %>% datatable %>% formatRound(1, digits=4)
       
       
       return(sum.model3) 
@@ -280,7 +285,7 @@ server <- function(input, output, session) {
       # MSE =  c(round(results.timeStream()$mse, digits = 3),NA,NA,NA)
       new = data.frame(MSE = c(results.timeStream()$mse,NA,NA,NA), R.Squared = c(sum.3$r.squared,NA,NA,NA))
 
-      res = rbind(datOut,t(new)) %>% datatable %>% formatRound(1:4, digits=2)
+      res = rbind(datOut,t(new)) %>% datatable %>% formatRound(1:4, digits=4)
 
       return(res)
     }

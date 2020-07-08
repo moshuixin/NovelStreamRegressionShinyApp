@@ -40,11 +40,8 @@ streamMulti <- function(X,y,m,constant){
     ysamp = y[((i-1)*n+1): (n*i),]
     
     message('Coming the block:',i)
-    #print('-------------------')
   
     # determine the learning rate q 
-    #print("Determin the value q")
-    
     if ( is.na(constant) ){
       #print("initial q is not a constant")
       N <- nrow(xsamp)*i
@@ -65,16 +62,14 @@ streamMulti <- function(X,y,m,constant){
     yhat <- 1/n * q* (t(ysamp) %*% ysamp) + (1-q) *yhat
     
     # update beta 
-   
-    betanew <-  solve(t(xsamp) %*% xsamp) %*% (t(xsamp) %*% ysamp) 
-    
+    betanew  =  solve(z) %*% (zhat) 
+
     beta <- betanew
-    
     message('beta is:',beta)
     
     # update the minimization of mse
     
-    mse <- yhat - 2*( t(beta) %*% zhat) +(t(beta)%*%z %*%beta)
+    mse <- yhat - 2*( t(beta) %*% zhat) + (t(beta) %*% z %*% beta)
     
     message('mse is:', mse)
     
@@ -82,7 +77,7 @@ streamMulti <- function(X,y,m,constant){
     rss <- nrow(X)*mse
     
     # total sum of squares
-    tss <- sum(y- mean(y)^2)
+    tss <- sum((y- mean(y))^2)
     
     # R-Squared 
     rsq <- 1- (rss/tss)
@@ -106,5 +101,7 @@ streamMulti <- function(X,y,m,constant){
   
   # stores the mse and the parameters
   result <- list('Coefficients'= betaIter,'summary'= dt)
+  #print(xtable(t(result$Coefficients), "Stream-LSE Model"))
+  #print(result$summary)
   return(result)
 }
