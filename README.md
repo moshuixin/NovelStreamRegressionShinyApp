@@ -3,7 +3,7 @@ The goal of this shiny app is to provide a way to evaluate and visualize the nov
 
 Content
 --
-The datasets consist of the real-life datasets and the artificial datasets. The real-life datasets used in thie projecct is FREE and can be found [here.]("http://pages.stern.nyu.edu/~wgreene/Text/tables/tablelist5.htm")
+The datasets consist of the real-life datasets and the artificial datasets. The real-life datasets used in thie projecct is FREE and can be found [here.](http://pages.stern.nyu.edu/~wgreene/Text/tables/tablelist5.htm)
 
 It contains two novel stream regression mothods: Stream-LSE and Time-Stream.
 
